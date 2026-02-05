@@ -1,5 +1,5 @@
-GitHub Repository: https://github.com/yourusername/payback
-Deployed API URL: https://payback-api-xxxx.onrender.com
+GitHub Repository: https://github.com/arshdeep-singh2003/payback_API
+Deployed API URL: https://payback-api.onrender.com
 
 Student Name: Arshdeep Singh
 Student Number: 9042880

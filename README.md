@@ -26,7 +26,7 @@ PayBack is a clean, focused web app that lets roommates privately record directi
 
 1. Clone the repository:
 ```bash
-git clone <your-repo-url>
+git clone <https://github.com/arshdeep-singh2003/payback_API>
 cd PayBack
 ```
 
