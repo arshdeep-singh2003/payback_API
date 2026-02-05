@@ -1,0 +1,18 @@
+GitHub Repository: https://github.com/yourusername/payback
+Deployed API URL: https://payback-api-xxxx.onrender.com
+
+Student Name: Arshdeep Singh
+Student Number: 9042880
+Course: PROG2500 - Open-Source Full Stack Development
+Sprint: Sprint 1 (Backend)
+Professor: John Prinz
+
+---
+
+IMPORTANT: Replace the URLs above with your actual GitHub and Render URLs before submitting!
+
+Instructions:
+1. Copy your GitHub repository URL from GitHub
+2. Copy your deployed Render URL from your Render dashboard
+3. Replace the placeholder URLs above
+4. Submit this file to the Sprint 1 submission folder in D2L
