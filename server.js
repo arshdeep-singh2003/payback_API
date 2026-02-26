@@ -4,6 +4,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const iouRoutes = require('./routes/ious');
 const paymentRoutes = require('./routes/payments');
+const userRoutes = require('./routes/users');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -30,24 +31,32 @@ app.get('/', (req, res) => {
         register: 'POST /api/auth/register',
         login: 'POST /api/auth/login'
       },
+      users: {
+        list: 'GET /api/users',
+        details: 'GET /api/users/:id'
+      },
       ious: {
         list: 'GET /api/ious',
         details: 'GET /api/ious/:id',
         create: 'POST /api/ious',
-        update: 'PATCH /api/ious/:id',
+        update: 'PUT /api/ious/:id',
+        patch_status: 'PATCH /api/ious/:id',
         delete: 'DELETE /api/ious/:id'
       },
       payments: {
+        list: 'GET /api/payments?iou_id=:id',
         create: 'POST /api/payments',
-        list: 'GET /api/payments?iou_id=:id'
+        update: 'PUT /api/payments/:id',
+        delete: 'DELETE /api/payments/:id'
       }
     },
-    documentation: 'See README.md for full API documentation'
+    documentation: 'See payback-collection.json for Postman collection'
   });
 });
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/ious', iouRoutes);
 app.use('/api/payments', paymentRoutes);
 

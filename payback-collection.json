@@ -1,0 +1,280 @@
+{
+  "info": {
+    "name": "PayBack API",
+    "_postman_id": "payback-api-collection-v1",
+    "description": "PayBack - Informal Roommate IOU Tracker\nStudent: Arshdeep Singh | Student #: 9042880\nCourse: PROG2500 - Open-Source Full Stack Development\nProfessor: John Prinz\n\nBase URL: https://payback-api.onrender.com\n\nHow to use protected endpoints:\n1. Use 'Register User' or 'Login User' to get a JWT token\n2. Copy the 'token' value from the response\n3. In the collection Variables tab, set 'token' to that value\n4. All protected endpoints automatically use Bearer {{token}}",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://payback-api.onrender.com",
+      "type": "string",
+      "description": "Live API base URL on Render"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "description": "JWT token - paste here after login/register"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Public endpoints for user registration and login. No token required.",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a new user account.\n\nBody fields:\n- name (string, required)\n- email (string, required, must be valid email)\n- password (string, required, min 6 characters)\n\nPassword is hashed with bcrypt before storage. Plain-text password is NEVER stored.\n\nExpected Status: 201 Created\nReturns: JWT token + user info (no password)"
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login with email and password.\n\nBody fields:\n- email (string, required)\n- password (string, required)\n\nExpected Status: 200 OK\nReturns: JWT token + user info\n\nCopy the 'token' from the response and set it as the 'token' collection variable."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "description": "User endpoints. All routes require a valid JWT token in the Authorization header.",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            },
+            "description": "Get a list of all registered users.\n\nPassword hash is NEVER included in the response.\n\nUse this to find the user_id needed for the 'borrower_id' when creating an IOU.\n\nExpected Status: 200 OK\nReturns: Array of users (user_id, name, email, created_at)"
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "1"]
+            },
+            "description": "Get a single user by their ID.\n\nExpected Status: 200 OK\nIf user does not exist: 404 Not Found"
+          }
+        }
+      ]
+    },
+    {
+      "name": "IOUs",
+      "description": "IOU (Resource A) CRUD endpoints. All routes require a valid JWT token.\n\nFull CRUD: GET all, GET by ID, POST create, PUT update, DELETE.",
+      "item": [
+        {
+          "name": "Get All IOUs",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/ious",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ious"]
+            },
+            "description": "Get all IOUs where the authenticated user is the lender OR borrower.\n\nReturns two lists:\n- owedToMe: IOUs where you are the lender\n- iOwe: IOUs where you are the borrower\n\nAlso returns a summary with total amounts.\n\nExpected Status: 200 OK"
+          }
+        },
+        {
+          "name": "Get IOU by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/ious/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ious", "1"]
+            },
+            "description": "Get a single IOU by ID, including full payment history.\n\nExpected Status: 200 OK\nIf not found: 404 Not Found\nIf user is not the lender or borrower: 403 Forbidden"
+          }
+        },
+        {
+          "name": "Create IOU",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"borrower_id\": 2,\n  \"amount\": 25.00,\n  \"reason\": \"Lunch at restaurant\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ious",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ious"]
+            },
+            "description": "Create a new IOU. The authenticated user becomes the lender automatically.\n\nBody fields:\n- borrower_id (integer, required) - use GET /api/users to find IDs\n- amount (number, required, must be > 0)\n- reason (string, required)\n\nUsers table is linked to IOURecords via lender_id and borrower_id Foreign Keys.\n\nExpected Status: 201 Created\nIf borrower not found: 404 Not Found\nIf trying to create IOU with yourself: 400 Bad Request"
+          }
+        },
+        {
+          "name": "Update IOU (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 30.00,\n  \"reason\": \"Dinner and movie night\",\n  \"status\": \"Unpaid\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/ious/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ious", "1"]
+            },
+            "description": "Update an existing IOU. Only the lender can update.\n\nBody fields (all optional, at least one required):\n- amount (number, must be > 0)\n- reason (string)\n- status ('Unpaid' or 'Paid')\n\nExpected Status: 200 OK\nIf not found: 404 Not Found\nIf not the lender: 403 Forbidden"
+          }
+        },
+        {
+          "name": "Delete IOU",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/ious/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "ious", "1"]
+            },
+            "description": "Delete an IOU. Only the lender can delete. Cannot be deleted if payments already exist.\n\nExpected Status: 200 OK\nIf not found: 404 Not Found\nIf not the lender: 403 Forbidden\nIf payments exist: 400 Bad Request"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "description": "Payment (Resource B) CRUD endpoints. All routes require a valid JWT token.\n\nFull CRUD: GET all for IOU, POST create, PUT update, DELETE.\n\nPayments are linked to IOURecords via the iou_id Foreign Key (One-to-Many relationship).",
+      "item": [
+        {
+          "name": "Get Payments for IOU",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments?iou_id=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments"],
+              "query": [
+                { "key": "iou_id", "value": "1", "description": "The ID of the IOU to get payments for" }
+              ]
+            },
+            "description": "Get all payments for a specific IOU.\n\nQuery params:\n- iou_id (integer, required)\n\nExpected Status: 200 OK\nIf IOU not found: 404 Not Found\nIf not lender or borrower: 403 Forbidden"
+          }
+        },
+        {
+          "name": "Record Payment (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"iou_id\": 1,\n  \"payment_amount\": 10.00\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments"]
+            },
+            "description": "Record a payment on an IOU.\n\nBody fields:\n- iou_id (integer, required)\n- payment_amount (number, required, must be > 0)\n\nIf the full amount is paid, the IOU status is automatically set to 'Paid'.\n\nExpected Status: 201 Created\nIf IOU not found: 404 Not Found\nIf payment exceeds balance: 400 Bad Request"
+          }
+        },
+        {
+          "name": "Update Payment (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payment_amount\": 15.00\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "1"]
+            },
+            "description": "Update the amount of an existing payment.\n\nBody fields:\n- payment_amount (number, required, must be > 0)\n\nExpected Status: 200 OK\nIf not found: 404 Not Found\nIf not authorized: 403 Forbidden\nIf amount exceeds remaining balance: 400 Bad Request"
+          }
+        },
+        {
+          "name": "Delete Payment",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "1"]
+            },
+            "description": "Delete a payment record. If the IOU was marked 'Paid', it is automatically reset to 'Unpaid'.\n\nExpected Status: 200 OK\nIf not found: 404 Not Found\nIf not authorized: 403 Forbidden"
+          }
+        }
+      ]
+    }
+  ]
+}
