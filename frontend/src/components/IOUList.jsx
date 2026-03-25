@@ -5,27 +5,33 @@ export default function IOUList({ ious, navigate, type }) {
         ious.map(iou => (
           <button 
             key={iou.iou_id}
-            className="list-group-item list-group-item-action"
+            className="list-group-item list-group-item-action border-start border-4 ps-3"
             onClick={() => navigate(`/iou/${iou.iou_id}`)}
+            style={{
+              borderLeftColor: iou.status === 'Paid' ? '#28a745' : '#ffc107',
+              backgroundColor: iou.status === 'Paid' ? '#e8f5e9' : '#fff'
+            }}
           >
             <div className="d-flex justify-content-between align-items-start">
-              <div>
-                <h6 className="mb-1">{iou.reason}</h6>
+              <div className="text-start flex-grow-1">
+                <h6 className="mb-1 fw-bold">{iou.reason}</h6>
                 <small className="text-muted">
                   {type === 'lender' ? `from ${iou.borrower_name}` : `owed to ${iou.lender_name}`}
                 </small>
               </div>
               <div className="text-end">
-                <p className="mb-0"><strong>${iou.remaining_balance}</strong></p>
-                <small className={iou.status === 'Paid' ? 'text-success' : 'text-warning'}>
+                <p className="mb-1"><strong className="fs-5">${iou.remaining_balance}</strong></p>
+                <span className={`badge ${iou.status === 'Paid' ? 'bg-success' : 'bg-warning text-dark'}`}>
                   {iou.status}
-                </small>
+                </span>
               </div>
             </div>
           </button>
         ))
       ) : (
-        <p className="text-muted">No IOUs</p>
+        <div className="text-center text-muted py-5">
+          <p>No IOUs</p>
+        </div>
       )}
     </div>
   )

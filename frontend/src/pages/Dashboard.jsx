@@ -42,45 +42,113 @@ export default function Dashboard({ user }) {
     }
   }
 
-  if (loading) return <div className="p-5">Loading...</div>
+  if (loading) return (
+    <div className="container py-5 text-center">
+      <div className="spinner-border text-primary" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  )
 
   return (
-    <div className="container py-5">
-      <div className="row mb-4">
-        <div className="col">
-          <h1>Dashboard</h1>
+    <div className="bg-light min-vh-100 py-5">
+      <div className="container">
+        <div className="row mb-5">
+          <div className="col">
+            <h1 className="display-5 fw-bold text-dark">Welcome, {user.name}! 👋</h1>
+            <p className="text-muted">Manage your IOUs and keep track of shared expenses</p>
+          </div>
+          <div className="col-auto">
+            <button className="btn btn-primary btn-lg" onClick={() => setShowModal(true)}>
+              ➕ Create IOU
+            </button>
+          </div>
         </div>
-        <div className="col text-end">
-          <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-            Create IOU
-          </button>
-        </div>
+
+        {error && <div className="alert alert-danger alert-dismissible fade show" role="alert">{error}<button type="button" className="btn-close" onClick={() => setError('')}></button></div>}
+
+        {ious && (
+          <>
+            {/* Summary Cards */}
+            <div className="row g-4 mb-5">
+              <div className="col-md-4">
+                <div className="card bg-success bg-opacity-10 border-success shadow-sm">
+                  <div className="card-body">
+                    <div className="d-flex justify-content-between align-items-center">
+                      <div>
+                        <p className="card-text text-muted mb-2">Money Owed to You</p>
+                        <h3 className="card-title text-success">${ious.summary.totalOwedToMe}</h3>
+                      </div>
+                      <div style={{ fontSize: '3rem' }}>💚</div>
+                    </div>
+                    <small className="text-muted">{ious.owedToMe.filter(i => i.status === 'Unpaid').length} unpaid IOUs</small>
+                  </div>
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="card bg-danger bg-opacity-10 border-danger shadow-sm">
+                  <div className="card-body">
+                    <div className="d-flex justify-content-between align-items-center">
+                      <div>
+                        <p className="card-text text-muted mb-2">Money You Owe</p>
+                        <h3 className="card-title text-danger">${ious.summary.totalIOwe}</h3>
+                      </div>
+                      <div style={{ fontSize: '3rem' }}>❤️</div>
+                    </div>
+                    <small className="text-muted">{ious.iOwe.filter(i => i.status === 'Unpaid').length} unpaid IOUs</small>
+                  </div>
+                </div>
+              </div>
+              <div className="col-md-4">
+                <div className="card bg-info bg-opacity-10 border-info shadow-sm">
+                  <div className="card-body">
+                    <div className="d-flex justify-content-between align-items-center">
+                      <div>
+                        <p className="card-text text-muted mb-2">Total Tracked</p>
+                        <h3 className="card-title text-info">${(parseFloat(ious.summary.totalOwedToMe) + parseFloat(ious.summary.totalIOwe)).toFixed(2)}</h3>
+                      </div>
+                      <div style={{ fontSize: '3rem' }}>📊</div>
+                    </div>
+                    <small className="text-muted">{ious.summary.unpaidIOUsCount} total unpaid</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* IOUs Sections */}
+            <div className="row g-4">
+              <div className="col-lg-6">
+                <div className="card shadow-sm">
+                  <div className="card-header bg-success bg-opacity-25 border-success">
+                    <h5 className="mb-0">💸 Money Owed to Me</h5>
+                  </div>
+                  <div className="card-body">
+                    <IOUList ious={ious.owedToMe} navigate={navigate} type="lender" />
+                  </div>
+                </div>
+              </div>
+              <div className="col-lg-6">
+                <div className="card shadow-sm">
+                  <div className="card-header bg-danger bg-opacity-25 border-danger">
+                    <h5 className="mb-0">💳 Money I Owe</h5>
+                  </div>
+                  <div className="card-body">
+                    <IOUList ious={ious.iOwe} navigate={navigate} type="borrower" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {showModal && (
+          <CreateIOUModal 
+            users={users}
+            onClose={() => setShowModal(false)}
+            onCreate={handleCreateIOU}
+          />
+        )}
       </div>
-
-      {error && <div className="alert alert-danger">{error}</div>}
-
-      {ious && (
-        <div className="row">
-          <div className="col-md-6">
-            <h4>Money Owed to Me</h4>
-            <IOUList ious={ious.owedToMe} navigate={navigate} type="lender" />
-            <p className="mt-2"><strong>Total: ${ious.summary.totalOwedToMe}</strong></p>
-          </div>
-          <div className="col-md-6">
-            <h4>Money I Owe</h4>
-            <IOUList ious={ious.iOwe} navigate={navigate} type="borrower" />
-            <p className="mt-2"><strong>Total: ${ious.summary.totalIOwe}</strong></p>
-          </div>
-        </div>
-      )}
-
-      {showModal && (
-        <CreateIOUModal 
-          users={users}
-          onClose={() => setShowModal(false)}
-          onCreate={handleCreateIOU}
-        />
-      )}
     </div>
   )
 }
