@@ -14,12 +14,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Request logging middleware
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
-  next();
-});
-
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
@@ -78,20 +72,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
 app.listen(PORT, () => {
-  console.log(`
-╔════════════════════════════════════════╗
-║                                        ║
-║   💰 PayBack API Server Running 💰     ║
-║                                        ║
-║   Port: ${PORT.toString().padEnd(32)}║
-║   Environment: ${process.env.NODE_ENV?.padEnd(23) || 'development'.padEnd(23)}║
-║                                        ║
-║   Ready to track IOUs! 🎯              ║
-║                                        ║
-╚════════════════════════════════════════╝
-  `);
+  console.log(`Server running on port ${PORT}`);
 });
 
 module.exports = app;
