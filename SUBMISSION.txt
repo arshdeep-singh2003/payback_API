@@ -1,9 +1,10 @@
 GitHub Repository: https://github.com/arshdeep-singh2003/payback_API
 Deployed API URL: https://payback-api.onrender.com
+Deployed frontend URL: https://payback-frontend-fgl6.onrender.com/
 Documentation: Postman collection JSON file is included in the repository as payback-collection.json
 
 Student Name: Arshdeep Singh
 Student Number: 9042880
 Course: PROG2500 - Open-Source Full Stack Development
-Sprint: Sprint 1 (Backend)
+Sprint: Sprint 2 Review (Backend)
 Professor: John Prinz

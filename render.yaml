@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: payback-api
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        value: your_jwt_secret_here
+        scope: run
+      - key: DATABASE_URL
+        fromDatabase:
+          name: payback-db
+          property: connectionString
+
+databases:
+  - name: payback-db
+    databaseName: payback
+    user: payback_user
+    plan: free
