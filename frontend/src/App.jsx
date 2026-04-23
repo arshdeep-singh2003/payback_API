@@ -9,6 +9,7 @@ import Analytics from './pages/Analytics'
 import History from './pages/History'
 import Settings from './pages/Settings'
 import Users from './pages/Users'
+import Roommates from './pages/Roommates'
 import NotFound from './pages/NotFound'
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
         <Route path="/analytics" element={user ? <Analytics user={user} /> : <Navigate to="/login" />} />
         <Route path="/history" element={user ? <History user={user} /> : <Navigate to="/login" />} />
         <Route path="/users" element={user ? <Users user={user} /> : <Navigate to="/login" />} />
+        <Route path="/roommates" element={user ? <Roommates user={user} /> : <Navigate to="/login" />} />
         <Route path="/settings" element={user ? <Settings user={user} setUser={setUser} /> : <Navigate to="/login" />} />
         <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
         <Route path="*" element={<NotFound />} />

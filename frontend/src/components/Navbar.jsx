@@ -44,6 +44,11 @@ export default function Navbar({ user, setUser }) {
                 Users
               </Link>
             </li>
+            <li className="nav-item">
+              <Link className={`nav-link ${isActive('/roommates')}`} to="/roommates">
+                Roommates
+              </Link>
+            </li>
             <li className="nav-item dropdown">
               <a className="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
                 {user?.name}
