@@ -9,6 +9,7 @@ import Analytics from './pages/Analytics'
 import History from './pages/History'
 import Settings from './pages/Settings'
 import Users from './pages/Users'
+import NotFound from './pages/NotFound'
 
 function App() {
   const [user, setUser] = useState(null)
@@ -45,6 +46,7 @@ function App() {
         <Route path="/users" element={user ? <Users user={user} /> : <Navigate to="/login" />} />
         <Route path="/settings" element={user ? <Settings user={user} setUser={setUser} /> : <Navigate to="/login" />} />
         <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   )
