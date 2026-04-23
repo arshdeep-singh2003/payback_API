@@ -20,7 +20,7 @@ export const authService = {
 export const iouService = {
   getAll: () => API.get('/ious'),
   getById: (id) => API.get(`/ious/${id}`),
-  create: (borrower_id, amount, reason) => API.post('/ious', { borrower_id, amount, reason }),
+  create: (data) => API.post('/ious', data),
   update: (id, data) => API.put(`/ious/${id}`, data),
   patch: (id, status) => API.patch(`/ious/${id}`, { status }),
   delete: (id) => API.delete(`/ious/${id}`)
@@ -36,6 +36,12 @@ export const paymentService = {
 export const userService = {
   getAll: () => API.get('/users'),
   getById: (id) => API.get(`/users/${id}`)
+}
+
+export const roommateService = {
+  getAll: () => API.get('/roommates'),
+  add: (roommate_user_id) => API.post('/roommates', { roommate_user_id }),
+  remove: (roommate_user_id) => API.delete(`/roommates/${roommate_user_id}`)
 }
 
 export default API

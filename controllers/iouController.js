@@ -152,30 +152,40 @@ const createIOU = async (req, res) => {
       return res.status(400).json({ success: false, errors: errors.array() });
     }
 
-    const lenderId = req.user.userId;
-    const { borrower_id, amount, reason } = req.body;
+    const userId = req.user.userId;
+    const { borrower_id, lender_id, amount, reason, role } = req.body;
 
-    // Prevent a user from creating an IOU with themselves
-    if (lenderId === parseInt(borrower_id)) {
-      return res.status(400).json({
-        success: false,
-        message: 'You cannot create an IOU with yourself'
-      });
+    let finalLenderId, finalBorrowerId;
+
+    if (role === 'borrower') {
+      // Current user is the borrower — they owe money to lender_id
+      if (!lender_id) {
+        return res.status(400).json({ success: false, message: 'lender_id is required when role is borrower' });
+      }
+      finalLenderId = parseInt(lender_id);
+      finalBorrowerId = userId;
+    } else {
+      // Default: current user is the lender — borrower_id owes them
+      if (!borrower_id) {
+        return res.status(400).json({ success: false, message: 'borrower_id is required' });
+      }
+      finalLenderId = userId;
+      finalBorrowerId = parseInt(borrower_id);
     }
 
-    // Verify borrower exists (FK would catch this, but gives a cleaner 404)
-    const borrowerExists = await pool.query(
-      'SELECT user_id FROM Users WHERE user_id = $1',
-      [borrower_id]
-    );
+    if (finalLenderId === finalBorrowerId) {
+      return res.status(400).json({ success: false, message: 'You cannot create an IOU with yourself' });
+    }
+
+    const otherUserId = role === 'borrower' ? finalLenderId : finalBorrowerId;
+    const borrowerExists = await pool.query('SELECT user_id FROM Users WHERE user_id = $1', [otherUserId]);
     if (borrowerExists.rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'Borrower not found' });
+      return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    // Insert IOU - lender_id and borrower_id are Foreign Keys to Users table
     const result = await pool.query(
       'INSERT INTO IOURecords (lender_id, borrower_id, amount, reason) VALUES ($1, $2, $3, $4) RETURNING *',
-      [lenderId, borrower_id, amount, reason]
+      [finalLenderId, finalBorrowerId, amount, reason]
     );
 
     res.status(201).json({

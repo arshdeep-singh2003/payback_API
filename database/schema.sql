@@ -4,6 +4,7 @@
 -- Drop tables if they exist (for clean setup)
 DROP TABLE IF EXISTS Payments CASCADE;
 DROP TABLE IF EXISTS IOURecords CASCADE;
+DROP TABLE IF EXISTS Roommates CASCADE;
 DROP TABLE IF EXISTS Users CASCADE;
 
 -- Create Users table
@@ -27,6 +28,18 @@ CREATE TABLE IOURecords (
     CONSTRAINT different_users CHECK (lender_id != borrower_id)
 );
 
+-- Create Roommates table (per-user list of added roommates)
+CREATE TABLE Roommates (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES Users(user_id) ON DELETE CASCADE,
+    roommate_user_id INTEGER NOT NULL REFERENCES Users(user_id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, roommate_user_id),
+    CONSTRAINT no_self_roommate CHECK (user_id != roommate_user_id)
+);
+
+CREATE INDEX idx_roommates_user ON Roommates(user_id);
+
 -- Create Payments table
 CREATE TABLE Payments (
     payment_id SERIAL PRIMARY KEY,
@@ -43,7 +56,7 @@ CREATE INDEX idx_users_email ON Users(email);
 
 -- Sample data for testing (optional)
 -- INSERT INTO Users (name, email, password_hash) VALUES
--- ('John Doe', 'john@example.com', '$2a$10$samplehash1'),
+-- ('Arshdeep Singh', 'Arshdeep@example.com', '$2a$10$samplehash1'),
 -- ('Jane Smith', 'jane@example.com', '$2a$10$samplehash2');
 
 -- INSERT INTO IOURecords (lender_id, borrower_id, amount, reason, status) VALUES

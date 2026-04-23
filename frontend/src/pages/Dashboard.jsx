@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { iouService, userService } from '../services/api'
+import { iouService, roommateService } from '../services/api'
 import IOUList from '../components/IOUList'
 import CreateIOUModal from '../components/CreateIOUModal'
 
@@ -19,12 +19,12 @@ export default function Dashboard({ user }) {
   const fetchData = async () => {
     try {
       setLoading(true)
-      const [iouRes, usersRes] = await Promise.all([
+      const [iouRes, roommatesRes] = await Promise.all([
         iouService.getAll(),
-        userService.getAll()
+        roommateService.getAll()
       ])
       setIOUs(iouRes.data.data)
-      setUsers(usersRes.data.data.filter(u => u.user_id !== user.userId))
+      setUsers(roommatesRes.data.data)
     } catch (err) {
       setError('Failed to load data')
     } finally {
@@ -34,7 +34,7 @@ export default function Dashboard({ user }) {
 
   const handleCreateIOU = async (data) => {
     try {
-      await iouService.create(data.borrower_id, data.amount, data.reason)
+      await iouService.create(data)
       setShowModal(false)
       fetchData()
     } catch (err) {

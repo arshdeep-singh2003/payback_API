@@ -54,6 +54,11 @@ export default function Navbar({ user, setUser }) {
                 <li><button className="dropdown-item" onClick={handleLogout}>Logout</button></li>
               </ul>
             </li>
+            <li className="nav-item ms-2">
+              <button className="btn btn-outline-light btn-sm" onClick={handleLogout}>
+                Logout
+              </button>
+            </li>
           </ul>
         </div>
       </div>
