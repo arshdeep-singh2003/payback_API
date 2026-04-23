@@ -6,6 +6,7 @@ const iouRoutes = require('./routes/ious');
 const paymentRoutes = require('./routes/payments');
 const userRoutes = require('./routes/users');
 const roommateRoutes = require('./routes/roommates');
+const setupRoutes = require('./routes/setup');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -55,6 +56,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/ious', iouRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/roommates', roommateRoutes);
+app.use('/api/setup', setupRoutes);
 
 // 404 handler
 app.use((req, res) => {

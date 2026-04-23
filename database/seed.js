@@ -11,8 +11,22 @@ async function seedDatabase() {
   });
 
   try {
+    // Create Roommates table if it doesn't exist yet
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS Roommates (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES Users(user_id) ON DELETE CASCADE,
+        roommate_user_id INTEGER NOT NULL REFERENCES Users(user_id) ON DELETE CASCADE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, roommate_user_id),
+        CONSTRAINT no_self_roommate CHECK (user_id != roommate_user_id)
+      )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_roommates_user ON Roommates(user_id)`);
+
     await pool.query('DELETE FROM Payments');
     await pool.query('DELETE FROM IOURecords');
+    await pool.query('DELETE FROM Roommates');
     await pool.query('DELETE FROM Users');
 
     const salt = await bcrypt.genSalt(10);
@@ -93,7 +107,18 @@ async function seedDatabase() {
       );
     }
 
+    // Add all other users as roommates for user[0] (Arshdeep)
+    for (let i = 1; i < userIds.length; i++) {
+      await pool.query(
+        'INSERT INTO Roommates (user_id, roommate_user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+        [userIds[0], userIds[i]]
+      );
+    }
+
     console.log('Database seeded successfully');
+    console.log('\nTest accounts (password: Test@123):');
+    users.forEach(u => console.log(`  ${u.name} — ${u.email}`));
+    console.log('\nRoommates added for Arshdeep Singh: John Doe, Jane Smith, Mike Johnson, Sarah Williams');
 
   } catch (error) {
     console.error('Error seeding database:', error.message);
